@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XOX Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        #board {
+            width: 306px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 3px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f2f2f2;
+        }
+
+        #status {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>XOX Game</h1>
+
+<div id="board"></div>
+<div id="status">Player X Turn</div>
+<button onclick="resetGame()">Restart</button>
+
+<script>
+    const board = document.getElementById("board");
+    const statusText = document.getElementById("status");
+
+    let currentPlayer = "X";
+    let cells = [];
+    let gameActive = true;
+
+    function createBoard() {
+        board.innerHTML = "";
+        cells = [];
+        for (let i = 0; i < 9; i++) {
+            let cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.addEventListener("click", () => makeMove(cell, i));
+            board.appendChild(cell);
+            cells.push(cell);
+        }
+    }
+
+    function makeMove(cell, index) {
+        if (cell.textContent !== "" || !gameActive) return;
+
+        cell.textContent = currentPlayer;
+
+        if (checkWinner()) {
+            statusText.textContent = "Player " + currentPlayer + " Wins!";
+            gameActive = false;
+            return;
+        }
+
+        if (cells.every(c => c.textContent !== "")) {
+            statusText.textContent = "It's a Draw!";
+            gameActive = false;
+            return;
+        }
+
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        statusText.textContent = "Player " + currentPlayer + " Turn";
+    }
+
+    function checkWinner() {
+        const winPatterns = [
+            [0,1,2],[3,4,5],[6,7,8],
+            [0,3,6],[1,4,7],[2,5,8],
+            [0,4,8],[2,4,6]
+        ];
+
+        return winPatterns.some(pattern => {
+            const [a, b, c] = pattern;
+            return cells[a].textContent &&
+                   cells[a].textContent === cells[b].textContent &&
+                   cells[a].textContent === cells[c].textContent;
+        });
+    }
+
+    function resetGame() {
+        currentPlayer = "X";
+        gameActive = true;
+        statusText.textContent = "Player X Turn";
+        createBoard();
+    }
+
+    createBoard();
+</script>
+
+</body>
+</html>
